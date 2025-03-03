@@ -1,0 +1,13 @@
+aiofiles
+fastapi
+uvicorn[standard]
+sqlmodel
+pypdf
+python-docx
+docx2txt
+unstructured
+chromadb
+langchain
+langchain-community
+langchain-chroma
+langchain-ollama
