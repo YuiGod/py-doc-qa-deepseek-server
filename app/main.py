@@ -9,8 +9,9 @@ from routers import chat_router
 from routers import chat_session_router
 from routers import document_router
 
+
 app = FastAPI()
-# 导入子模块
+# 导入 fastApi 子模块
 app.include_router(chat_router.router)
 app.include_router(chat_session_router.router)
 app.include_router(document_router.router)

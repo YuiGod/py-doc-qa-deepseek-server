@@ -1,4 +1,5 @@
 from typing import Annotated
+import uuid
 from fastapi import APIRouter, Form, Query
 from fastapi.responses import FileResponse
 from core.langchain_vector import vector_documents
@@ -45,9 +46,9 @@ async def del_doc(data: DocumentParams):
     return success(None, "删除成功！")
 
 
-@router.post("/read")
-async def read_doc_file(data: DocumentParams):
-    file_path, realName = document_crud.download(data.id)
+@router.get("/read/{item_id}")
+async def read_doc_file(item_id: uuid.UUID):
+    file_path, realName = document_crud.download(item_id)
     headers = {"Content-Disposition": f"inline; filename*=UTF-8''{realName}"}
     return FileResponse(path=file_path, headers=headers, media_type=None)
 

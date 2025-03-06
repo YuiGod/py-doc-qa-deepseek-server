@@ -7,12 +7,12 @@ from .base import engine
 
 class ChatHistoryCrud:
 
-    def add_item(slef, chatHistory: ChatHistoryCreate):
+    def add_item(slef, chat_history: ChatHistoryCreate):
         """chat历史添加记录"""
-        chatHistory = chatHistory.model_dump(exclude_unset=True)
+        chat_history = chat_history.model_dump(exclude_unset=True)
 
         with Session(engine) as session:
-            db_history = ChatHistory.model_validate(chatHistory)
+            db_history = ChatHistory.model_validate(chat_history)
             session.add(db_history)
             session.commit()
             session.refresh(db_history)
@@ -25,8 +25,8 @@ class ChatHistoryCrud:
                 .where(ChatHistory.chat_session_id == chatSessionId)
                 .order_by(ChatHistory.date)
             )
-            resultList = session.exec(query).all()
-            return resultList
+            result_list = session.exec(query).all()
+            return result_list
 
     def delete_by_chat_session_id(self, chatSessionId: str):
         """删除历史记录"""
@@ -35,7 +35,7 @@ class ChatHistoryCrud:
                 ChatHistory.chat_session_id == chatSessionId
             )
 
-            resultList = session.exec(query).all()
-            for dbChat in resultList:
-                session.delete(dbChat)
+            result_list = session.exec(query).all()
+            for db_chat in result_list:
+                session.delete(db_chat)
             session.commit()

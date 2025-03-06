@@ -19,7 +19,7 @@ router = APIRouter(
     responses={404: {"message": "您所访问的资源不存在！"}},
 )
 
-chatHistoryCrud = ChatHistoryCrud()
+chat_history_crud = ChatHistoryCrud()
 
 
 @router.post("")
@@ -27,25 +27,25 @@ async def chatting(data: ChatParams):
     if not data.messages:
         raise HTTPException(status_code=500, detail="网络异常，请稍后重试！")
 
-    # 获取历史记录
-    historyList = chatHistoryCrud.list_by_chat_session_id(data.chat_session_id)
-    # 历史记录转换成LangChain提示词模板
-    historyPrompt = build_history_template(historyList)
-    # LangChain 检索链 astream() 的参数
-    invokeParams = {"question": data.messages.content, "chat_history": historyPrompt}
-
-    # user 消息添加到历史记录中
-    userChat = ChatHistoryCreate(
+    # 先获取历史记录
+    history_list = chat_history_crud.list_by_chat_session_id(data.chat_session_id)
+    # 再保存 user 消息到历史记录中
+    user_chat = ChatHistoryCreate(
         role=data.messages.role,
         content=data.messages.content,
         chat_session_id=data.chat_session_id,
     )
-    chatHistoryCrud.add_item(userChat)
+    chat_history_crud.add_item(user_chat)
+
+    # 历史记录转换成LangChain提示词模板
+    history_message = build_history_template(history_list)
+    # LangChain 检索链 astream() 的参数
+    invoke_params = {"question": data.messages.content, "chat_history": history_message}
 
     try:
         chain = build_qa_chain()
         return StreamingResponse(
-            generate_stream(chain, invokeParams, data.chat_session_id),
+            generate_stream(chain, invoke_params, data.chat_session_id),
             media_type="application/x-ndjson",
         )
     except Exception as e:
@@ -53,12 +53,29 @@ async def chatting(data: ChatParams):
 
 
 # chat 返回响应流
-async def generate_stream(chain, invokeParams, chat_session_id):
+async def generate_stream(chain, invoke_params, chat_session_id):
     """LangChain 流响应转 JSON 字符串流响应"""
 
-    responseChat = ""
-    async for chunk in chain.astream(invokeParams):
-        responseChat += chunk
+    think = ""
+    content = ""
+    isThinking = False
+    # 一个跳过本次循环的标记，目的是剔除think标签
+    loop_continue = False
+    res = []
+    async for chunk in chain.astream(invoke_params):
+        res.append(chunk)
+        loop_continue = False
+        if "<think>" in chunk:
+            isThinking = True
+            loop_continue = True
+        if "</think>" in chunk:
+            isThinking = False
+            loop_continue = True
+        if not loop_continue:
+            if isThinking:
+                think += chunk
+            else:
+                content += chunk
 
         json_chunk = json.dumps(
             jsonable_encoder(
@@ -68,7 +85,8 @@ async def generate_stream(chain, invokeParams, chat_session_id):
                     message=Chatting(role="assistant", content=chunk),
                     done=False,
                 ).model_dump(exclude_none=True)
-            )
+            ),
+            ensure_ascii=False,
         )
         # 换行符分隔JSON行
         yield f"{json_chunk}\n"
@@ -83,29 +101,22 @@ async def generate_stream(chain, invokeParams, chat_session_id):
                 done=True,
                 done_reason="stop",
             )
-        )
+        ),
+        ensure_ascii=False,
     )
     yield f"{done}\n"
 
     # 流式响应完成后，assistant 消息保存到历史消息记录中
-    think = ""
-    content = ""
-    if "<think>" in responseChat:
-        think = responseChat.split("<think>")[1].split("</think>")[0]
-        content = responseChat.split("</think>")[1]
-    else:
-        content = responseChat
-
     assistantChat = ChatHistoryCreate(
         role="assistant",
         content=content,
         think=think,
         chat_session_id=chat_session_id,
     )
-    chatHistoryCrud.add_item(assistantChat)
+    chat_history_crud.add_item(assistantChat)
 
 
 @router.get("/history")
 async def chat_history(params: Annotated[ChatSessionParams, Query()]):
-    results = chatHistoryCrud.list_by_chat_session_id(params.id)
+    results = chat_history_crud.list_by_chat_session_id(params.id)
     return success(results)

@@ -8,30 +8,30 @@ from .base import engine
 class ChatSessionCrud:
     def save(self, data: ChatSessionParams):
 
-        chatSession = ChatSessionUpdate(title=data.title)
+        chat_session = ChatSessionUpdate(title=data.title)
 
         if data.id:
             with Session(engine) as session:
-                dbUpdateSession = session.get(ChatSession, data.id)
-                chatSession = chatSession.model_dump(exclude_unset=True)
-                dbUpdateSession.sqlmodel_update(chatSession)
-                session.add(dbUpdateSession)
+                db_update_session = session.get(ChatSession, data.id)
+                chat_session = chat_session.model_dump(exclude_unset=True)
+                db_update_session.sqlmodel_update(chat_session)
+                session.add(db_update_session)
                 session.commit()
-                session.refresh(dbUpdateSession)
-                return dbUpdateSession
+                session.refresh(db_update_session)
+                return db_update_session
 
         with Session(engine) as session:
-            dbAddSession = ChatSession.model_validate(chatSession)
-            session.add(dbAddSession)
+            db_add_session = ChatSession.model_validate(chat_session)
+            session.add(db_add_session)
             session.commit()
-            session.refresh(dbAddSession)
-            return dbAddSession
+            session.refresh(db_add_session)
+            return db_add_session
 
     def list(self):
         with Session(engine) as session:
             query = select(ChatSession).order_by(desc(ChatSession.date))
-            chatSessionList = session.exec(query).all()
-            return chatSessionList
+            chat_session_list = session.exec(query).all()
+            return chat_session_list
 
     def delete(self, id: str):
         """删除会话记录"""
