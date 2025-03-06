@@ -7,6 +7,11 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 import readline
 
+
+"""
+构建检索链流程，示例代码
+"""
+
 # 向量数据库目录
 VECTOR_DIR = "/home/ly/Project/vector_store"
 # 模型名称

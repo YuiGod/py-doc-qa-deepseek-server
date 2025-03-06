@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 from fastapi import File, UploadFile
 from sqlmodel import Field, SQLModel
 from pydantic import BaseModel, field_validator
@@ -60,7 +60,7 @@ class DocumentParams(SQLModel):
     page_size: Optional[int] = None
 
 
-class DocumentRecord(SQLModel):
+class DocumentFormat(SQLModel):
     """文档记录（格式化日期）"""
 
     id: uuid.UUID
@@ -85,7 +85,7 @@ class DocumentPage(BaseModel):
     total: int
     page_num: int
     page_size: int
-    list: List[DocumentRecord]
+    list: list[DocumentFormat]
 
 
 class DocumentResponse(BaseModel):

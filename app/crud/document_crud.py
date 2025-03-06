@@ -4,11 +4,11 @@ import uuid
 import aiofiles
 import aiofiles.os
 from fastapi import File, HTTPException, UploadFile
-from sqlmodel import Session, func, select
+from sqlmodel import Session, desc, func, select
 from models.document_model import (
     Document,
+    DocumentFormat,
     DocumentParams,
-    DocumentRecord,
     DocumentUpdate,
     UpdateFormData,
     UploadFormData,
@@ -72,13 +72,13 @@ class DocumentCrud:
         )
 
         with Session(engine) as session:
-            db_document = session.get(Document, data.id)
-            if not db_document:
+            dbDocument = session.get(Document, data.id)
+            if not dbDocument:
                 raise HTTPException(status_code=404, detail="找不到该记录。")
 
             if file:
                 # 数据库查找旧的文件名，并删除文件
-                path = Path(self.__BASE_PATH + db_document.file_path)
+                path = Path(self.__BASE_PATH + dbDocument.file_path)
                 await self.__delete_file(path)
                 # 保存新的文件
                 newFileName, newFilePath, newSuffix = await self.__save_file(file)
@@ -88,11 +88,11 @@ class DocumentCrud:
                 doc.vector = ""
 
             doc = doc.model_dump(exclude_unset=True)
-            db_document.sqlmodel_update(doc)
-            session.add(db_document)
+            dbDocument.sqlmodel_update(doc)
+            session.add(dbDocument)
             session.commit()
-            session.refresh(db_document)
-            return db_document
+            session.refresh(dbDocument)
+            return dbDocument
 
     async def delete(self, id: str):
         """删除文档记录，并删除文件"""
@@ -113,19 +113,19 @@ class DocumentCrud:
         limit = params.page_size
         name = params.name
         with Session(engine) as session:
-            count_query = select(func.count(Document.id))
+            countQuery = select(func.count(Document.id))
             query = select(Document)
 
             # 根据 name 模糊查询，并查询总数
             if name:
-                count_query = count_query.where(Document.name.contains(name))
+                countQuery = countQuery.where(Document.name.contains(name))
                 query = query.where(Document.name.contains(name))
 
-            query.order_by(Document.date).offset(offset).limit(limit)
+            query.order_by(desc(Document.date)).offset(offset).limit(limit)
 
-            total = session.exec(count_query).one()
+            total = session.exec(countQuery).one()
             items = session.exec(query).all()
-            list = [DocumentRecord.model_validate(d) for d in items]
+            list = [DocumentFormat.model_validate(d) for d in items]
             return {
                 "total": total,
                 "page_num": params.page_num,
@@ -139,12 +139,12 @@ class DocumentCrud:
             if not document:
                 raise HTTPException(status_code=404, detail="文档未找到")
 
-            file_path = Path(self.__BASE_PATH + document.file_path)
+            filePath = Path(self.__BASE_PATH + document.file_path)
             realName = (
-                str(document.name + file_path.suffix).encode("utf-8").decode("latin1")
+                str(document.name + filePath.suffix).encode("utf-8").decode("latin1")
             )
 
-            return file_path, realName
+            return filePath, realName
 
     def vector_all_docs(self):
         with Session(engine) as session:

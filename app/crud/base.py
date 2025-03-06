@@ -4,7 +4,7 @@ from sqlmodel import SQLModel, Session, create_engine
 
 
 # 导入所有数据库表
-from models import document_model
+from models import document_model, chat_session_model, chat_history_model
 
 # 创建数据库
 sqlite_file_name = "document_qa.db"

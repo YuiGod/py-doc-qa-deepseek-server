@@ -1,14 +1,18 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-import uvicorn
-
 from crud.base import create_db_and_tables
-from routers import document_router
-from routers.base import failure
 
+from routers.base import failure
+from routers import chat_router
+from routers import chat_session_router
+from routers import document_router
 
 app = FastAPI()
+# 导入子模块
+app.include_router(chat_router.router)
+app.include_router(chat_session_router.router)
 app.include_router(document_router.router)
 
 
