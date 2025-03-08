@@ -161,7 +161,7 @@ class ChatHistory(SQLModel, table=True):
       }
     }
 
-*   Responses 响应体：返回 JSON 对象流。`content-type: application/x-ndjson`
+*   Responses 响应体：JSON 对象字符串二进制流。`content-type: application/x-ndjson`
 
 <!---->
 
