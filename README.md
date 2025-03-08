@@ -1,6 +1,6 @@
 # 📃 **关于vue-doc-qa-chat**
 
-基于  [🦜️🔗 LangChain](https://github.com/hwchase17/langchain) 与  DeepSeek R1 语言模型的本地知识库问答。
+基于  [🦜️🔗 LangChain](https://github.com/hwchase17/langchain) 与  DeepSeek R1 大语言模型的本地知识库问答。
 
 本项目是本地知识库问答应用的 serve 后端。目前实现基本的 RAG 功能。  
 后续会系统学习 langchain ，逐步添加更多的功能。
@@ -49,12 +49,12 @@ python main.py
 
 ## 项目预览
 
-> 因为git压缩了帧率，看起来不够流畅。可点击这里下载预览视频观看：预览视频
+> 因为git压缩了帧率，看起来不够流畅。可点击这里下载预览视频观看：[预览视频。](https://raw.githubusercontent.com/YuiGod/py-doc-qa-deepseek-server/refs/heads/main/images/preview.mp4)
 
-![chat_preview](./public/images/chat_preview.png)  
-![preview_1](./public/images/preview_1.gif)  
-![preview_2](./public/images/preview_2.gif)  
-![preview_3](./public/images/preview_3.gif)  
+![chat_preview](./images/chat_preview.png)  
+![preview_1](./images/preview_1.gif)  
+![preview_2](./images/preview_2.gif)  
+![preview_3](./images/preview_3.gif)  
 
 ## 项目功能
 
@@ -141,7 +141,7 @@ class ChatHistory(SQLModel, table=True):
 
 ## Api 接口
 
-![fastApi](./public/images/fastapi.png)
+![fastApi](./images/fastapi.png)
 
 ### 1. 聊天
 
