@@ -6,7 +6,7 @@ from sqlmodel import Field, SQLModel
 
 
 class ChatSession(SQLModel, table=True):
-    """ChatSession表"""
+    """chatsession表"""
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     title: str | None = None
@@ -22,7 +22,7 @@ class ChatSessionUpdate(SQLModel):
 class ChatSessionParams(BaseModel):
     """对话请求参数"""
 
-    id: Optional[uuid.UUID] = None
+    id: Optional[uuid.UUID]
     title: Optional[str] = None
 
 

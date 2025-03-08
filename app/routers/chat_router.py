@@ -5,7 +5,7 @@ from fastapi import APIRouter, Form, HTTPException, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import StreamingResponse
 
-from models.chat_history_model import ChatHistoryCreate
+from models.chat_history_model import ChatHistoryCreate, ChatHistoryResponse
 from crud.chat_history_crud import ChatHistoryCrud
 from models.chat_session_model import ChatSessionParams, ChatSessionResponse
 from core.langchain_retrieval import build_history_template, build_qa_chain
@@ -116,7 +116,7 @@ async def generate_stream(chain, invoke_params, chat_session_id):
     chat_history_crud.add_item(assistantChat)
 
 
-@router.get("/history")
+@router.get("/history", response_model=ChatHistoryResponse)
 async def chat_history(params: Annotated[ChatSessionParams, Query()]):
     results = chat_history_crud.list_by_chat_session_id(params.id)
     return success(results)

@@ -5,7 +5,7 @@ from sqlmodel import Field, SQLModel
 
 
 class ChatHistory(SQLModel, table=True):
-    """ChatHistory表"""
+    """chathistory表"""
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     role: str

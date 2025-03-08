@@ -14,10 +14,9 @@ def build_history_template(chat_history_list: list[ChatHistory]):
 
     if type(chat_history_list) != list or len(chat_history_list) == 0:
         return []
-        # raise HTTPException(status_code=500, detail="没有对话消息列表。")
 
     history_messages: list[BaseMessage] = []
-    # 历史记录转换为 LangChain 消息对象
+    # 历史记录转换为 LangChain 消息对象数组
     for history in chat_history_list:
         if history.role == "user":
             history_messages.append(HumanMessage(content=history.content))
@@ -28,12 +27,13 @@ def build_history_template(chat_history_list: list[ChatHistory]):
 
 def build_qa_chain():
 
+    # 初始化 Chroma 向量数据库
     vector_store = Chroma(
         persist_directory=VECTOR_DIR,
         collection_name=COLLECTION_NAME,
         embedding_function=OllamaEmbeddings(model=MODEL_NAME),
     )
-
+    # 初始化 deepseek
     llm = ChatOllama(
         model=MODEL_NAME,
         temperature=0.3,
@@ -41,6 +41,7 @@ def build_qa_chain():
         callbacks=[StreamingStdOutCallbackHandler()],
     )
 
+    # 初始化检索，并配置
     retriever = vector_store.as_retriever(
         search_type="mmr",
         search_kwargs={
@@ -54,7 +55,7 @@ def build_qa_chain():
     # system 提示词模板
     system_template = """
         您是一个设计用于査询文档来回答问题的代理，您的名字是超级牛逼哄哄的小天才助手。
-        您可以使用文档检索工具，并基于检索内容来回答问题。
+        您可以使用文档检索工具，并基于检索内容来回答问题。不需要说出检索文档的id。
         您可能不查询文档就知道答案，但是您仍然应该查询文档来获得答案。
         如果用户的问题与检索文档上下文的内容无关，您仍然应该查询文档来获得答案。
         如果您从文档中找不到任何信息用于回答问题，则只需返回“抱歉，这个问题我还不知道。”作为答案。
@@ -68,11 +69,14 @@ def build_qa_chain():
         ]
     )
 
+    # 构建检索链管道 Runnable
+    # retriever.invoke() 作用是根据用户问题检索匹配最相关的文档
+    # x 值是管道里的参数，包括 question，chat_history，还要其他有关langchain的参数
     return (
         {
-            "question": lambda x: x["question"],
             "context": lambda x: retriever.invoke(x["question"]),
             "chat_history": lambda x: x["chat_history"],
+            "question": lambda x: x["question"],
         }
         | prompt
         | llm

@@ -140,11 +140,9 @@ class DocumentCrud:
                 raise HTTPException(status_code=404, detail="文档未找到")
 
             file_path = Path(self.__BASE_PATH + document.file_path)
-            realName = (
-                str(document.name + file_path.suffix).encode("utf-8").decode("latin1")
-            )
+            real_name = document.name + file_path.suffix
 
-            return file_path, realName
+            return file_path, real_name
 
     def vector_all_docs(self):
         with Session(engine) as session:

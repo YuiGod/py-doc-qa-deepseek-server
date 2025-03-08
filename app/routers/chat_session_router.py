@@ -29,13 +29,13 @@ async def chat_session_add(params: ChatSessionParams):
 
 
 @router.put("/update")
-async def chat_session_add(params: ChatSessionParams):
+async def chat_session_update(params: ChatSessionParams):
     results = chat_session_crud.save(params)
     return success(results, "修改成功！")
 
 
 @router.delete("/delete")
-async def chat_session_add(params: ChatSessionParams):
+async def chat_session_delete(params: ChatSessionParams):
     chat_history_crud.delete_by_chat_session_id(params.id)
     chat_session_crud.delete(params.id)
     return success(None, "删除成功！")
