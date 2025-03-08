@@ -1,6 +1,5 @@
 from sqlmodel import Session, desc, select
 from models.chat_history_model import ChatHistory, ChatHistoryCreate
-from models.chat_model import Chatting
 
 from .base import engine
 

@@ -108,7 +108,7 @@ def create_vector_store(split_docs, persist_dir=VECTOR_DIR):
         print(f"\n开始向量化====>")
 
         # vector_store = Chroma.from_documents(
-        #     client=chroma_client,
+        #     persist_directory=persist_dir,
         #     collection_name="documents_qa",
         #     documents=split_docs,
         #     embedding=OllamaEmbeddings(model=MODEL_NAME),

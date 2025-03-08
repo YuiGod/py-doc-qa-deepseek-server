@@ -61,9 +61,9 @@ async def generate_stream(chain, invoke_params, chat_session_id):
     isThinking = False
     # 一个跳过本次循环的标记，目的是剔除think标签
     loop_continue = False
-    res = []
+
     async for chunk in chain.astream(invoke_params):
-        res.append(chunk)
+        # 收集 think 和 content
         loop_continue = False
         if "<think>" in chunk:
             isThinking = True
