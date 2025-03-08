@@ -1,4 +1,4 @@
-# 📃 **关于vue-doc-qa-chat**
+# 📃 **关于 py-doc-qa-deepseek-server**
 
 基于  [🦜️🔗 LangChain](https://github.com/hwchase17/langchain) 与  DeepSeek R1 大语言模型的本地知识库问答。
 
