@@ -16,6 +16,8 @@
 1.  [《从零开始DeepSeek R1搭建本地知识库问答系统》一：利用WSL2搭建Linux子系统并设置运行环境前言](https://juejin.cn/post/7470334881735196684)
 2.  [《从零开始DeepSeek R1搭建本地知识库问答系统》二：Ollama 部署 DeepSeek R1 蒸馏模型及Api测试](https://juejin.cn/post/7470345587309854774)
 3.  [《从零开始DeepSeek R1搭建本地知识库问答系统》三：基于LangChain构建本地知识库问答RAG应用](https://juejin.cn/post/7470807715898212406)
+4.  [《从零开始DeepSeek R1搭建本地知识库问答系统》四：FastApi 框架搭建本地知识库问答Web Server端](https://juejin.cn/post/7478991058870747170)
+5.  [《从零开始DeepSeek R1搭建本地知识库问答系统》五：实现问答系统前端 UI 框架，基于 vue3 + typescript + ElementPlus](https://juejin.cn/post/7480009518175567907)
 
 ## 项目使用前提
 
