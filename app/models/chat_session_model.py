@@ -22,7 +22,7 @@ class ChatSessionUpdate(SQLModel):
 class ChatSessionParams(BaseModel):
     """对话请求参数"""
 
-    id: Optional[uuid.UUID]
+    id: Optional[uuid.UUID] = None
     title: Optional[str] = None
 
 
