@@ -1,16 +1,14 @@
 from fastapi import HTTPException
-from langchain_chroma import Chroma
 from langchain_community.document_loaders import (
     DirectoryLoader,
     TextLoader,
     PyPDFLoader,
     Docx2txtLoader,
 )
-from langchain_ollama import OllamaEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import time
 
-from .base import COLLECTION_NAME, LOAD_PATH, MODEL_NAME, VECTOR_DIR
+from .base import LOAD_PATH, VECTOR_DIR, chroma_vector_store
 
 
 def load_documents(source_dir=LOAD_PATH):
@@ -88,11 +86,7 @@ def create_vector_store(split_docs, persist_dir=VECTOR_DIR):
     """
 
     # 初始化 Chroma 向量数据库
-    vector_store = Chroma(
-        persist_directory=persist_dir,
-        collection_name=COLLECTION_NAME,
-        embedding_function=OllamaEmbeddings(model=MODEL_NAME),
-    )
+    vector_store = chroma_vector_store()
 
     # 向量化文档之前，先把原来集合里的数据清空
     ids = vector_store._collection.get()["ids"]

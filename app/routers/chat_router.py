@@ -5,11 +5,12 @@ from fastapi import APIRouter, Form, HTTPException, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import StreamingResponse
 
-from models.chat_history_model import ChatHistoryCreate, ChatHistoryResponse
 from crud.chat_history_crud import ChatHistoryCrud
-from models.chat_session_model import ChatSessionParams, ChatSessionResponse
-from core.langchain_retrieval import build_history_template, build_qa_chain
+from models.chat_history_model import ChatHistoryCreate, ChatHistoryResponse
+from models.chat_session_model import ChatSessionParams
 from models.chat_model import ChatParams, ChatStreamResponse, Chatting
+from core.base import MODEL_NAME
+from core.langchain_retrieval import build_history_template, build_qa_chain
 from routers.base import success
 
 
@@ -80,7 +81,7 @@ async def generate_stream(chain, invoke_params, chat_session_id):
         json_chunk = json.dumps(
             jsonable_encoder(
                 ChatStreamResponse(
-                    model="deepseek-r1:7b",
+                    model=MODEL_NAME,
                     created_at=int(round(time.time() * 1000)),
                     message=Chatting(role="assistant", content=chunk),
                     done=False,
@@ -95,7 +96,7 @@ async def generate_stream(chain, invoke_params, chat_session_id):
     done = json.dumps(
         jsonable_encoder(
             ChatStreamResponse(
-                model="deepseek-r1:7b",
+                model=MODEL_NAME,
                 created_at=int(round(time.time() * 1000)),
                 message=Chatting(role="assistant", content=""),
                 done=True,

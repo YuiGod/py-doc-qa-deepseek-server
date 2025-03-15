@@ -1,12 +1,9 @@
-from langchain_chroma import Chroma
-from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 from models.chat_history_model import ChatHistory
-from .base import COLLECTION_NAME, MODEL_NAME, VECTOR_DIR
+from .base import chat_llm, chroma_vector_store
 
 
 def build_history_template(chat_history_list: list[ChatHistory]):
@@ -28,18 +25,10 @@ def build_history_template(chat_history_list: list[ChatHistory]):
 def build_qa_chain():
 
     # 初始化 Chroma 向量数据库
-    vector_store = Chroma(
-        persist_directory=VECTOR_DIR,
-        collection_name=COLLECTION_NAME,
-        embedding_function=OllamaEmbeddings(model=MODEL_NAME),
-    )
-    # 初始化 deepseek
-    llm = ChatOllama(
-        model=MODEL_NAME,
-        temperature=0.3,
-        streaming=True,
-        callbacks=[StreamingStdOutCallbackHandler()],
-    )
+    vector_store = chroma_vector_store()
+
+    # 初始化 deepseek 模型
+    llm = chat_llm()
 
     # 初始化检索，并配置
     retriever = vector_store.as_retriever(
