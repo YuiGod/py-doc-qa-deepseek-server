@@ -6,7 +6,6 @@ from langchain_community.document_loaders import (
     PyPDFLoader,
     Docx2txtLoader,
 )
-from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import time
 
@@ -16,6 +15,9 @@ from .base import LOAD_PATH, VECTOR_DIR, chroma_vector_store
 def clean_text(text: str) -> str:
     """统一文本清洗函数"""
 
+    cleaned = ""
+    if not text.strip():
+        return cleaned
     # 1. 标准化全角字符（字母、数字、标点）为半角
     normalized = unicodedata.normalize("NFKC", text)
     # 2. 删除所有空格（包括全角空格\u3000和普通空格）
@@ -77,7 +79,7 @@ def load_documents(source_dir=LOAD_PATH):
             doc.page_content = clean_text(doc.page_content)
 
         # 合并文档列表
-        docs = [Document]
+        docs = []
         docs.extend(text_loader.load())
         docs.extend(pdf_docs)
         docs.extend(docx_loader.load())
