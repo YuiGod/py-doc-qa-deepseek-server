@@ -34,10 +34,9 @@ def build_qa_chain():
     retriever = vector_store.as_retriever(
         search_type="mmr",
         search_kwargs={
-            "k": 5,
-            "fetch_k": 20,
-            "lambda_mult": 0.5,
-            "score_threshold": 0.6,
+            "k": 3,  # 检索结果返回最相似的文档数量
+            "fetch_k": 20,  # 要传递给 MMR 算法的文档量
+            "lambda_mult": 0.5,  # MMR 返回的结果多样性，1 表示最小多样性，0 表示最大值。（默认值：0.5）
         },
     )
 
@@ -47,8 +46,9 @@ def build_qa_chain():
         您可以使用文档检索工具，并基于检索内容来回答问题。不需要说出检索文档的id。
         您可能不查询文档就知道答案，但是您仍然应该查询文档来获得答案。
         如果用户的问题与检索文档上下文的内容无关，您仍然应该查询文档来获得答案。
+        结合文档内容作为答案,切记不可自由发挥,不可胡编乱造。
         如果您从文档中找不到任何信息用于回答问题，则只需返回“抱歉，这个问题我还不知道。”作为答案。
-        文档上下文：{context}
+        文档内容：{context}
         """
     prompt = ChatPromptTemplate(
         [

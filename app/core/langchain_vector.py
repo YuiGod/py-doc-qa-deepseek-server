@@ -1,3 +1,4 @@
+import unicodedata
 from fastapi import HTTPException
 from langchain_community.document_loaders import (
     DirectoryLoader,
@@ -5,10 +6,34 @@ from langchain_community.document_loaders import (
     PyPDFLoader,
     Docx2txtLoader,
 )
+from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import time
 
 from .base import LOAD_PATH, VECTOR_DIR, chroma_vector_store
+
+
+def clean_text(text: str) -> str:
+    """统一文本清洗函数"""
+
+    # 1. 标准化全角字符（字母、数字、标点）为半角
+    normalized = unicodedata.normalize("NFKC", text)
+    # 2. 删除所有空格（包括全角空格\u3000和普通空格）
+    cleaned = normalized.replace("\u3000", "").replace(" ", "")
+    # 3. 中文标点替换为英文标点（按需扩展）
+    replacements = {
+        "，": ",",
+        "。": ".",
+        "（": "(",
+        "）": ")",
+        "；": ";",
+        "：": ":",
+        "！": "!",
+        "？": "?",
+    }
+    for cn, en in replacements.items():
+        cleaned = cleaned.replace(cn, en)
+    return cleaned
 
 
 def load_documents(source_dir=LOAD_PATH):
@@ -44,10 +69,17 @@ def load_documents(source_dir=LOAD_PATH):
             loader_cls=Docx2txtLoader,
             loader_kwargs={"autodetect_encoding": True},
         )
+
+        # 初步清洗 PDF 文档的文本，删除多余空格。
+        # TODO: 后续会修改，将单独优化 PDF 文档的分割。
+        pdf_docs = pdf_loader.load()
+        for doc in pdf_docs:
+            doc.page_content = clean_text(doc.page_content)
+
         # 合并文档列表
-        docs = []
+        docs = [Document]
         docs.extend(text_loader.load())
-        docs.extend(pdf_loader.load())
+        docs.extend(pdf_docs)
         docs.extend(docx_loader.load())
         print(f"成功加载 {len(docs)} 份文档")
         return docs
@@ -101,12 +133,6 @@ def create_vector_store(split_docs, persist_dir=VECTOR_DIR):
         start_time = time.time()
         print(f"\n开始向量化====>")
 
-        # vector_store = Chroma.from_documents(
-        #     persist_directory=persist_dir,
-        #     collection_name="documents_qa",
-        #     documents=split_docs,
-        #     embedding=OllamaEmbeddings(model=MODEL_NAME),
-        # )
         # 向量化文档到向量数据库
         vector_store.add_documents(split_docs)
 

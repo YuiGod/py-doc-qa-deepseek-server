@@ -2,6 +2,7 @@ aiofiles
 fastapi
 uvicorn[standard]
 sqlmodel
+python-multipart
 pypdf
 python-docx
 docx2txt
@@ -11,3 +12,15 @@ langchain
 langchain-community
 langchain-chroma
 langchain-ollama
+
+# langchain 的 deepseek api key 依赖包
+# langchain-deepseek
+
+# langchain 专用 openai 依赖包
+# langchain_openai
+
+# 利用 huggingface 库下的 Transformers 或 Sentence-Transformers 调用 embedding 模型
+# langchain_huggingface
+
+# 利用 FlagEmbedding 库调用 embedding 模型
+# FlagEmbedding
