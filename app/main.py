@@ -30,6 +30,11 @@ async def http_exception_handler(request, exc):
     )
 
 
+@app.get("/")
+def read_root():
+    return {"code": 200, "message": "已启动服务"}
+
+
 if __name__ == "__main__":
     # 创建或启动数据库
     create_db_and_tables()
