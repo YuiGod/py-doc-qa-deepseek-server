@@ -32,7 +32,7 @@ async def http_exception_handler(request, exc):
 
 @app.get("/")
 def read_root():
-    return {"code": 200, "message": "已启动服务"}
+    return {"code": 200, "message": "已启动服务。"}
 
 
 if __name__ == "__main__":
